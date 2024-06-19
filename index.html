@@ -1,11 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scriptive Public Assets</title>
+    <style>
+        body {
+            background-color: #eee;
+            padding: 20px;
+            font-family: Inter,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: rgb(68, 72, 245);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: rgb(68, 72, 245, 0.8);
+        }
+
+        .signature {
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow: hidden;
+            max-width: 600px;
+            font: unset;
+        }
+
+        .fake-email__body {
+            margin-bottom: 40px;
+        }
+
+        .paragraph-skeleton {
+            width: 100%;
+            height: 20px;
+            background-color: #ddd;
+            margin-bottom: 10px;
+        }
+
+        .signature-configuration form {
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            gap: 20px;
+            border: 1px solid #ccc;
+            padding: 15px;
+            background-color: white;
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .input-container label {
+            margin-bottom: 4px;
+        }
+
+        .input-container input {
+            padding: 10px;
+        }
+
+        ol {
+            padding-left: 20px;
+        }
+
+        ol li {
+            margin-bottom: 8px;
+        }
+    </style>
 </head>
+
 <body>
-    
+    <h2>Email Signature</h2>
+
+    <div class="signature-configuration">
+        <form>
+            <div class="input-container">
+                <label for="name">Name</label>
+                <input id="name" type="text">
+            </div>
+
+            <div class="input-container">
+                <label for="title">Title / Position</label>
+                <input id="title" type="text">
+            </div>
+
+            <button type="submit">Update Signature</button>
+        </form>
+    </div>
+
+    <div class="signature">
+        <div class="fake-email">
+            <div class="fake-email__body">
+                <div class="paragraph-skeleton"></div>
+                <div class="paragraph-skeleton"></div>
+                <div class="paragraph-skeleton"></div>
+            </div>
+            <div class="signature-container">
+                <span>Loading Signature...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="signature-controls">
+        <button id="copy-signature">Copy for GMail</button>
+    </div>
+
+    <div class="info-links">
+        <h3>How to add your signature</h3>
+        <ol>
+            <li>
+                <span>Follow <a href="https://support.google.com/mail/answer/8395">Add GMail Signature Guide</a></span>
+            </li>
+            <li>
+                <span>Click "Copy for Gmail" button above and then paste it into signature edit box.</span>
+            </li>
+        </ol>
+    </div>
+
+    <script>
+        const SIGNATURE_TEMPLATE_URL = 'https://raw.githubusercontent.com/avaloninnovations/public-assets/master/signature.html';
+
+        try {
+            fetch(SIGNATURE_TEMPLATE_URL)
+                .then(response => response.text())
+                .then(data => {
+                    document.querySelector('.signature-container').innerHTML = data;
+                });
+        } catch (error) {
+            console.error(error);
+        }
+
+        document.querySelector('#copy-signature').addEventListener('click', () => {
+            const signature = document.querySelector('.signature-container > *');
+
+            // Create a range and select the contents of the signature element
+            var range = document.createRange();
+            range.selectNodeContents(signature);
+
+            // Remove any existing selections
+            window.getSelection().removeAllRanges();
+
+            // Add the new range to the selection
+            window.getSelection().addRange(range);
+
+            // Copy the selection to the clipboard
+            try {
+                document.execCommand('copy');
+                alert('Signature copied to clipboard!');
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+            }
+
+            // Remove the selection
+            window.getSelection().removeAllRanges();
+        });
+
+        document.querySelector('.signature-configuration form').addEventListener('submit', (event) => {
+            event.preventDefault();
+
+            const name = document.querySelector('#name').value;
+            const title = document.querySelector('#title').value;
+
+            const signature = document.querySelector('.signature-container');
+
+            if (name) {
+                signature.querySelector('[data-info="name"]').textContent = name;
+            }
+
+            if (title) {
+                signature.querySelector('[data-info="title"]').textContent = title;
+            }
+        });
+    </script>
 </body>
+
 </html>
